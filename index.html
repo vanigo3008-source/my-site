@@ -3,8 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>The NATURE Code - Тест личности</title>
+    <title>The NATURE Code - Инструмент для саморефлексии</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js">
+    </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js">
+    </script>
     <style>
+        /* ===== СТИЛИ ===== */
         * {
             margin: 0;
             padding: 0;
@@ -25,14 +30,13 @@
             background: white;
             border-radius: 16px;
             box-shadow: 0 20px 60px rgba(0, 0, 0, 0.1);
-            max-width: 950px;
+            max-width: 1100px;
             width: 100%;
             padding: 40px;
             position: relative;
             min-height: 500px;
         }
 
-        /* ===== ЗАГОЛОВОК - УВЕЛИЧЕН ===== */
         .header {
             text-align: center;
             margin-bottom: 30px;
@@ -44,76 +48,74 @@
             font-size: 44px;
             font-weight: 800;
             color: #2c3e50;
-            letter-spacing: 3px;
-            line-height: 1.3;
-        }
-
-        .header h1 .brand {
-            color: #2c3e50;
+            letter-spacing: 2px;
         }
 
         .header h1 .brand-highlight {
-            color: #3498db;
+            color: #f39c12;
         }
 
-        .header h1 .author {
+        .header .author {
             display: block;
-            font-size: 20px;
+            font-size: 17px;
             font-weight: 600;
-            color: #e74c3c;
-            letter-spacing: 2px;
-            margin-top: 8px;
-            padding: 6px 0;
-            border-top: 3px solid #3498db;
-            border-bottom: 3px solid #3498db;
-            display: inline-block;
-            padding: 8px 30px;
-            border-radius: 10px;
-            background: rgba(52, 152, 219, 0.06);
-        }
-
-        .header h1 .author .by {
             color: #7f8c8d;
-            font-weight: 400;
-            font-size: 16px;
-        }
-
-        .header h1 .author .name {
-            color: #e74c3c;
-            font-weight: 700;
-            font-size: 22px;
+            margin-top: 6px;
+            letter-spacing: 1px;
         }
 
         .header .subtitle {
             color: #7f8c8d;
             font-size: 16px;
-            margin-top: 12px;
+            margin-top: 8px;
+            font-weight: 400;
+        }
+
+        .header .badge-ethical {
+            display: inline-block;
+            background: #f39c12;
+            color: white;
+            padding: 4px 20px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 600;
+            letter-spacing: 1px;
+            margin-top: 10px;
+        }
+
+        .header .disclaimer {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-top: 8px;
+            font-style: italic;
+            max-width: 700px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.5;
         }
 
         .hidden {
             display: none !important;
         }
 
-        /* ===== Экран ввода имени ===== */
+        /* ===== ЭКРАН ВВОДА ===== */
         .name-screen {
             text-align: center;
-            padding: 20px 20px;
+            padding: 10px 20px;
         }
 
-        /* ===== ВСТУПЛЕНИЕ ===== */
         .intro-section {
             background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
             border-radius: 16px;
             padding: 35px;
             margin-bottom: 30px;
             text-align: left;
-            border-left: 6px solid #3498db;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            border-left: 6px solid #f39c12;
         }
 
         .intro-section .badge {
             display: inline-block;
-            background: #3498db;
+            background: #f39c12;
             color: white;
             padding: 6px 20px;
             border-radius: 20px;
@@ -124,11 +126,6 @@
             margin-bottom: 14px;
         }
 
-        .intro-section .badge .author-badge {
-            color: #ffeaa7;
-            font-weight: 700;
-        }
-
         .intro-section h3 {
             font-size: 26px;
             color: #2c3e50;
@@ -136,12 +133,7 @@
         }
 
         .intro-section h3 .highlight {
-            color: #3498db;
-        }
-
-        .intro-section h3 .author-name-inline {
-            color: #e74c3c;
-            font-weight: 700;
+            color: #f39c12;
         }
 
         .intro-section p {
@@ -164,48 +156,53 @@
             border-radius: 12px;
             text-align: center;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
-            transition: transform 0.3s ease;
-        }
-
-        .intro-section .feature-item:hover {
-            transform: translateY(-3px);
         }
 
         .intro-section .feature-item .icon {
-            font-size: 32px;
+            font-size: 30px;
             display: block;
             margin-bottom: 8px;
         }
 
         .intro-section .feature-item .label {
-            font-size: 15px;
+            font-size: 16px;
             font-weight: 600;
             color: #2c3e50;
         }
 
         .intro-section .feature-item .desc {
-            font-size: 13px;
+            font-size: 14px;
             color: #7f8c8d;
             margin-top: 4px;
         }
 
+        .intro-section .disclaimer-box {
+            background: #fff3cd;
+            border-radius: 12px;
+            padding: 16px 20px;
+            margin-top: 20px;
+            border-left: 4px solid #f39c12;
+        }
+
+        .intro-section .disclaimer-box p {
+            font-size: 15px;
+            color: #856404;
+            margin-bottom: 4px;
+            line-height: 1.6;
+        }
+
+        .intro-section .disclaimer-box strong {
+            color: #533f03;
+        }
+
         .intro-section .cta-text {
-            font-size: 18px;
+            font-size: 19px;
             font-weight: 600;
             color: #2c3e50;
             text-align: center;
             margin-top: 20px;
             padding-top: 15px;
             border-top: 2px dashed #dee2e6;
-        }
-
-        .intro-section .cta-text .emoji {
-            font-size: 22px;
-        }
-
-        .intro-section .cta-text .author-cta {
-            color: #e74c3c;
-            font-weight: 700;
         }
 
         .name-screen h2 {
@@ -238,12 +235,12 @@
         }
 
         .name-input-group input:focus {
-            border-color: #3498db;
+            border-color: #f39c12;
         }
 
         .btn-start {
             padding: 16px 44px;
-            background: #3498db;
+            background: #f39c12;
             color: white;
             border: none;
             border-radius: 10px;
@@ -254,9 +251,9 @@
         }
 
         .btn-start:hover {
-            background: #2980b9;
+            background: #d68910;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.4);
+            box-shadow: 0 4px 15px rgba(243, 156, 18, 0.4);
         }
 
         .history-btn {
@@ -282,7 +279,7 @@
             font-size: 15px;
         }
 
-        /* ===== Прогресс ===== */
+        /* ===== ТЕСТ ===== */
         .progress-container {
             margin-bottom: 25px;
         }
@@ -297,7 +294,7 @@
 
         .progress-bar .fill {
             height: 100%;
-            background: linear-gradient(90deg, #3498db, #2ecc71);
+            background: linear-gradient(90deg, #f39c12, #e67e22);
             border-radius: 10px;
             transition: width 0.5s ease;
             width: 0%;
@@ -306,97 +303,94 @@
         .progress-text {
             display: flex;
             justify-content: space-between;
-            font-size: 15px;
+            font-size: 16px;
             color: #7f8c8d;
             margin-top: 8px;
         }
 
-        /* ===== Вопрос - УВЕЛИЧЕН ===== */
         .question-card {
             background: #fafbfc;
             border-radius: 12px;
-            padding: 35px;
+            padding: 40px;
             min-height: 320px;
             border: 1px solid #e8ecf0;
         }
 
         .question-number {
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
-            color: #3498db;
-            margin-bottom: 18px;
+            color: #f39c12;
+            margin-bottom: 20px;
         }
 
         .question-text {
-            font-size: 24px;
+            font-size: 28px;
             line-height: 1.7;
             color: #2c3e50;
-            margin-bottom: 35px;
+            margin-bottom: 40px;
             font-weight: 500;
         }
 
-        /* ===== Варианты ответов - УВЕЛИЧЕНЫ ===== */
         .options {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
-            gap: 12px;
+            gap: 14px;
             margin-bottom: 35px;
         }
 
         .option-btn {
-            padding: 16px 10px;
+            padding: 18px 12px;
             border: 2px solid #e0e4e8;
             border-radius: 12px;
             background: white;
             cursor: pointer;
             transition: all 0.3s ease;
             text-align: center;
-            font-size: 16px;
+            font-size: 18px;
             font-weight: 600;
             color: #2c3e50;
-            min-height: 75px;
+            min-height: 85px;
             display: flex;
             flex-direction: column;
             justify-content: center;
             align-items: center;
-            line-height: 1.4;
+            line-height: 1.5;
         }
 
         .option-btn:hover {
-            border-color: #3498db;
-            background: #ebf5fb;
+            border-color: #f39c12;
+            background: #fef9e7;
             transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.1);
         }
 
         .option-btn.selected {
-            border-color: #3498db;
-            background: #3498db;
+            border-color: #f39c12;
+            background: #f39c12;
             color: white;
-            box-shadow: 0 4px 12px rgba(52, 152, 219, 0.3);
+            box-shadow: 0 4px 12px rgba(243, 156, 18, 0.3);
             transform: scale(1.02);
         }
 
         .option-btn .label {
-            font-size: 28px;
+            font-size: 30px;
             font-weight: 800;
         }
 
         .option-btn .text {
-            font-size: 12px;
+            font-size: 14px;
             opacity: 0.8;
             font-weight: 500;
+            margin-top: 4px;
         }
 
         .option-btn.selected .text {
             opacity: 1;
         }
 
-        /* ===== Кнопки навигации ===== */
         .nav-buttons {
             display: flex;
             justify-content: space-between;
-            margin-top: 20px;
+            margin-top: 25px;
             gap: 15px;
         }
 
@@ -427,14 +421,13 @@
         }
 
         .btn-next {
-            background: #3498db;
+            background: #f39c12;
             color: white;
         }
 
         .btn-next:hover:not(:disabled) {
-            background: #2980b9;
+            background: #d68910;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(52, 152, 219, 0.3);
         }
 
         .btn-finish {
@@ -445,17 +438,22 @@
         .btn-finish:hover:not(:disabled) {
             background: #229954;
             transform: translateY(-2px);
-            box-shadow: 0 4px 15px rgba(39, 174, 96, 0.3);
         }
 
-        /* ===== Результаты ===== */
+        /* ===== РЕЗУЛЬТАТЫ ===== */
         .results-screen {
             animation: fadeIn 0.5s ease;
         }
 
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(20px); }
-            to { opacity: 1; transform: translateY(0); }
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .results-header {
@@ -469,43 +467,16 @@
 
         .results-header h2 {
             font-size: 34px;
-            letter-spacing: 3px;
-        }
-
-        .results-header h2 .brand {
-            color: #ffffff;
+            letter-spacing: 2px;
         }
 
         .results-header h2 .brand-highlight {
-            color: #3498db;
-        }
-
-        .results-header h2 .author {
-            display: block;
-            font-size: 18px;
-            font-weight: 600;
-            opacity: 0.9;
-            letter-spacing: 2px;
-            margin-top: 8px;
-            padding: 8px 24px;
-            border-radius: 8px;
-            background: rgba(255, 255, 255, 0.08);
-            display: inline-block;
-        }
-
-        .results-header h2 .author .by {
-            color: #bdc3c7;
-            font-weight: 400;
-        }
-
-        .results-header h2 .author .name {
             color: #f39c12;
-            font-weight: 700;
         }
 
         .results-header .user-name {
-            font-size: 20px;
-            opacity: 0.8;
+            font-size: 22px;
+            opacity: 0.9;
             margin-top: 8px;
         }
 
@@ -516,27 +487,51 @@
         }
 
         .results-header .profile {
-            font-size: 18px;
-            font-style: italic;
-            opacity: 0.9;
+            font-size: 20px;
+            font-weight: 700;
+            margin-top: 15px;
+            padding-top: 15px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #f39c12;
+        }
+
+        .results-header .disclaimer-badge {
             margin-top: 12px;
-            padding-top: 12px;
-            border-top: 1px solid rgba(255,255,255,0.1);
+            padding: 8px 20px;
+            background: rgba(255, 255, 255, 0.08);
+            border-radius: 20px;
+            display: inline-block;
+            font-size: 13px;
+            color: #bdc3c7;
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 20px;
+            margin-bottom: 25px;
         }
 
         .scale-card {
             background: white;
             border: 1px solid #e8ecf0;
             border-radius: 12px;
-            margin-bottom: 15px;
             overflow: hidden;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .scale-card:hover {
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.06);
         }
 
         .scale-header {
             padding: 14px 22px;
             font-weight: 700;
-            font-size: 18px;
+            font-size: 17px;
             color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
 
         .scale-body {
@@ -549,23 +544,34 @@
             align-items: center;
             margin-bottom: 10px;
             flex-wrap: wrap;
-            gap: 10px;
+            gap: 8px;
         }
 
         .scale-score {
-            font-size: 20px;
-            font-weight: 700;
+            font-size: 24px;
+            font-weight: 800;
             color: #2c3e50;
         }
 
+        .scale-percentile {
+            font-size: 15px;
+            color: #7f8c8d;
+            background: #f0f4f8;
+            padding: 2px 14px;
+            border-radius: 12px;
+        }
+
         .scale-level {
-            font-size: 16px;
+            font-size: 15px;
             font-weight: 600;
+            padding: 4px 14px;
+            border-radius: 20px;
+            background: #f0f4f8;
         }
 
         .scale-bar {
             width: 100%;
-            height: 14px;
+            height: 10px;
             background: #ecf0f1;
             border-radius: 10px;
             overflow: hidden;
@@ -579,9 +585,10 @@
         }
 
         .scale-title {
-            font-size: 18px;
+            font-size: 17px;
             font-weight: 600;
-            margin: 12px 0 6px 0;
+            margin: 10px 0 6px 0;
+            color: #2c3e50;
         }
 
         .scale-desc {
@@ -590,7 +597,36 @@
             line-height: 1.7;
         }
 
-        .recommendations {
+        .scale-reflection {
+            margin-top: 12px;
+            padding: 14px 18px;
+            background: #fef9e7;
+            border-radius: 8px;
+            border-left: 4px solid #f39c12;
+            font-size: 15px;
+            color: #6b5200;
+            line-height: 1.7;
+        }
+
+        .scale-reflection strong {
+            color: #533f03;
+        }
+
+        .radar-container {
+            background: white;
+            border: 1px solid #e8ecf0;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            text-align: center;
+        }
+
+        .radar-container canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        .reflection-questions {
             background: #2c3e50;
             color: white;
             padding: 28px 32px;
@@ -598,35 +634,37 @@
             margin-top: 20px;
         }
 
-        .recommendations h3 {
+        .reflection-questions h3 {
             font-size: 20px;
             margin-bottom: 15px;
             text-align: center;
+            color: #f39c12;
         }
 
-        .recommendations ul {
+        .reflection-questions ul {
             list-style: none;
             padding: 0;
         }
 
-        .recommendations li {
+        .reflection-questions li {
             padding: 10px 0;
-            border-bottom: 1px solid rgba(255,255,255,0.05);
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
             font-size: 16px;
-            line-height: 1.6;
-            padding-left: 24px;
+            line-height: 1.7;
+            padding-left: 28px;
             position: relative;
         }
 
-        .recommendations li::before {
-            content: "•";
+        .reflection-questions li::before {
+            content: "?";
             position: absolute;
             left: 0;
-            color: #3498db;
+            color: #f39c12;
             font-size: 20px;
+            font-weight: 700;
         }
 
-        .recommendations li:last-child {
+        .reflection-questions li:last-child {
             border-bottom: none;
         }
 
@@ -638,31 +676,47 @@
             flex-wrap: wrap;
         }
 
-        .btn-save {
-            background: #27ae60;
-            color: white;
-            padding: 14px 34px;
-            font-size: 17px;
-        }
-
-        .btn-save:hover {
-            background: #229954;
-            transform: translateY(-2px);
-        }
-
-        .btn-reset {
+        .btn-pdf {
             background: #e74c3c;
             color: white;
             padding: 14px 34px;
             font-size: 17px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
         }
 
-        .btn-reset:hover {
+        .btn-pdf:hover {
             background: #c0392b;
             transform: translateY(-2px);
         }
 
-        /* ===== Модал истории ===== */
+        .btn-pdf:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none !important;
+        }
+
+        .btn-reset {
+            background: #95a5a6;
+            color: white;
+            padding: 14px 34px;
+            font-size: 17px;
+            border: none;
+            border-radius: 10px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .btn-reset:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+
+        /* ===== МОДАЛ ===== */
         .history-modal {
             display: none;
             position: fixed;
@@ -703,18 +757,18 @@
         .history-table {
             width: 100%;
             border-collapse: collapse;
-            font-size: 15px;
+            font-size: 14px;
         }
 
         .history-table th {
             background: #2c3e50;
             color: white;
-            padding: 14px;
+            padding: 12px;
             text-align: left;
         }
 
         .history-table td {
-            padding: 14px;
+            padding: 12px;
             border-bottom: 1px solid #ecf0f1;
         }
 
@@ -738,7 +792,6 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .history-close:hover {
@@ -753,12 +806,10 @@
             border-radius: 8px;
             font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s ease;
         }
 
         .btn-clear-history:hover {
             background: #c0392b;
-            transform: translateY(-2px);
         }
 
         .no-history {
@@ -768,134 +819,365 @@
             font-size: 17px;
         }
 
+        /* ===== ПРЕЛОАДЕР ===== */
+        .loader-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 2000;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+        }
+
+        .loader-overlay.active {
+            display: flex;
+        }
+
+        .loader-spinner {
+            width: 50px;
+            height: 50px;
+            border: 5px solid #f3f3f3;
+            border-top: 5px solid #f39c12;
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+
+        .loader-text {
+            color: white;
+            font-size: 18px;
+            margin-top: 20px;
+            font-weight: 600;
+        }
+
+        /* ===== PDF-КОНТЕЙНЕР (невидимый для скриншота) ===== */
+        #pdfContainer {
+            position: absolute;
+            left: -9999px;
+            top: 0;
+            width: 800px;
+            background: white;
+            padding: 40px;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            z-index: -1;
+        }
+
+        #pdfContainer .pdf-header {
+            text-align: center;
+            border-bottom: 3px solid #f39c12;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+
+        #pdfContainer .pdf-header h1 {
+            font-size: 32px;
+            color: #2c3e50;
+        }
+
+        #pdfContainer .pdf-header h1 span {
+            color: #f39c12;
+        }
+
+        #pdfContainer .pdf-header .pdf-sub {
+            font-size: 16px;
+            color: #7f8c8d;
+            margin-top: 4px;
+        }
+
+        #pdfContainer .pdf-header .pdf-disclaimer {
+            font-size: 12px;
+            color: #95a5a6;
+            margin-top: 8px;
+            font-style: italic;
+        }
+
+        #pdfContainer .pdf-user {
+            font-size: 16px;
+            color: #2c3e50;
+            margin-bottom: 6px;
+        }
+
+        #pdfContainer .pdf-profile {
+            font-size: 18px;
+            font-weight: 700;
+            color: #f39c12;
+            margin-bottom: 16px;
+        }
+
+        #pdfContainer .pdf-scale {
+            margin-bottom: 16px;
+            padding-bottom: 14px;
+            border-bottom: 1px solid #ecf0f1;
+        }
+
+        #pdfContainer .pdf-scale-name {
+            font-size: 16px;
+            font-weight: 700;
+            color: #2c3e50;
+        }
+
+        #pdfContainer .pdf-scale-score {
+            font-size: 14px;
+            color: #7f8c8d;
+        }
+
+        #pdfContainer .pdf-scale-bar {
+            width: 100%;
+            height: 8px;
+            background: #ecf0f1;
+            border-radius: 4px;
+            margin: 6px 0;
+            overflow: hidden;
+        }
+
+        #pdfContainer .pdf-scale-bar .pdf-fill {
+            height: 100%;
+            border-radius: 4px;
+        }
+
+        #pdfContainer .pdf-scale-title {
+            font-size: 15px;
+            font-weight: 600;
+            color: #2c3e50;
+            margin-top: 4px;
+        }
+
+        #pdfContainer .pdf-scale-desc {
+            font-size: 14px;
+            color: #555;
+            line-height: 1.6;
+        }
+
+        #pdfContainer .pdf-scale-ref {
+            font-size: 13px;
+            color: #6b5200;
+            background: #fef9e7;
+            padding: 8px 12px;
+            border-radius: 6px;
+            margin-top: 6px;
+        }
+
+        #pdfContainer .pdf-reflection {
+            margin-top: 20px;
+            padding-top: 20px;
+            border-top: 2px solid #f39c12;
+        }
+
+        #pdfContainer .pdf-reflection h3 {
+            font-size: 18px;
+            color: #2c3e50;
+            margin-bottom: 10px;
+        }
+
+        #pdfContainer .pdf-reflection li {
+            font-size: 14px;
+            color: #555;
+            padding: 4px 0;
+            list-style: none;
+        }
+
+        #pdfContainer .pdf-reflection li::before {
+            content: "• ";
+            color: #f39c12;
+            font-weight: 700;
+        }
+
+        #pdfContainer .pdf-footer {
+            text-align: center;
+            font-size: 11px;
+            color: #bdc3c7;
+            margin-top: 30px;
+            padding-top: 16px;
+            border-top: 1px solid #ecf0f1;
+        }
+
+        /* ===== АДАПТИВНОСТЬ ===== */
         @media (max-width: 700px) {
-            .container { padding: 20px; }
-            .options { grid-template-columns: repeat(3, 1fr); }
-            .header h1 { font-size: 30px; }
-            .question-text { font-size: 20px; }
-            .name-input-group { flex-direction: column; align-items: center; }
-            .name-input-group input { width: 100%; max-width: 300px; }
-            .history-actions { flex-direction: column; align-items: center; }
-            .intro-section .features { grid-template-columns: 1fr; }
-            .intro-section { padding: 20px; }
-            .header h1 .author { font-size: 16px; padding: 6px 18px; }
-            .option-btn .label { font-size: 22px; }
-            .option-btn { min-height: 65px; padding: 12px 6px; font-size: 14px; }
-            .results-header h2 { font-size: 26px; }
+            .container {
+                padding: 20px;
+            }
+            .options {
+                grid-template-columns: repeat(3, 1fr);
+            }
+            .header h1 {
+                font-size: 30px;
+            }
+            .question-text {
+                font-size: 22px;
+            }
+            .name-input-group {
+                flex-direction: column;
+                align-items: center;
+            }
+            .name-input-group input {
+                width: 100%;
+                max-width: 300px;
+            }
+            .results-grid {
+                grid-template-columns: 1fr;
+            }
+            .intro-section .features {
+                grid-template-columns: 1fr;
+            }
+            .intro-section {
+                padding: 20px;
+            }
+            .option-btn .label {
+                font-size: 24px;
+            }
+            .option-btn {
+                min-height: 70px;
+                padding: 12px 8px;
+                font-size: 15px;
+            }
+            .results-header h2 {
+                font-size: 26px;
+            }
         }
 
         @media (max-width: 450px) {
-            .options { grid-template-columns: repeat(2, 1fr); }
-            .option-btn { min-height: 55px; font-size: 13px; padding: 10px 4px; }
-            .header h1 .author .name { font-size: 17px; }
-            .question-text { font-size: 17px; }
-            .option-btn .label { font-size: 20px; }
+            .options {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            .option-btn {
+                min-height: 60px;
+                font-size: 14px;
+                padding: 10px 6px;
+            }
+            .question-text {
+                font-size: 18px;
+            }
+            .option-btn .label {
+                font-size: 20px;
+            }
+            .option-btn .text {
+                font-size: 12px;
+            }
+        }
+
+        @media print {
+            .results-actions {
+                display: none;
+            }
+            .history-btn {
+                display: none;
+            }
+            .container {
+                box-shadow: none;
+                padding: 20px;
+            }
+            .scale-card {
+                break-inside: avoid;
+            }
         }
     </style>
 </head>
 <body>
 
+    <!-- ===== ПРЕЛОАДЕР ===== -->
+    <div class="loader-overlay" id="loaderOverlay">
+        <div class="loader-spinner"></div>
+        <div class="loader-text" id="loaderText">Подготовка отчёта...</div>
+    </div>
+
+    <!-- ===== НЕВИДИМЫЙ PDF-КОНТЕЙНЕР ===== -->
+    <div id="pdfContainer"></div>
+
     <div class="container" id="app">
-        <!-- ===== ЗАГОЛОВОК ===== -->
         <div class="header">
             <h1>
-                <span class="brand">The</span>
-                <span class="brand-highlight">NATURE</span>
-                <span class="brand">Code</span>
-                <span class="author">
-                    <span class="by">by</span>
-                    <span class="name">Igor Demin</span>
-                </span>
+                The <span class="brand-highlight">NATURE</span> Code
+                <span class="author">инструмент для саморефлексии</span>
             </h1>
-            <div class="subtitle">Авторская методика оценки личности</div>
+            <div class="subtitle">Исследуйте свои личностные предпочтения через 60 вопросов</div>
+            <div class="badge-ethical">⚖️ Этичный инструмент · Не является диагностикой</div>
+            <div class="disclaimer">
+                Этот инструмент предназначен для саморефлексии и не заменяет профессиональную психологическую консультацию.
+                Результаты не являются диагнозом и не должны использоваться для принятия важных жизненных решений.
+            </div>
         </div>
 
-        <!-- ===== ЭКРАН ВВОДА ИМЕНИ ===== -->
+        <!-- ===== ВВОД ИМЕНИ ===== -->
         <div id="nameScreen" class="name-screen">
-
-            <!-- ===== ВСТУПЛЕНИЕ ===== -->
             <div class="intro-section">
-                <div class="badge">
-                    🔬 Психологическая диагностика 
-                    <span class="author-badge">| by Igor Demin</span>
-                </div>
-
-                <h3>
-                    Узнайте свой <span class="highlight">код личности</span>
-                    <br>
-                    <small style="font-size: 18px; color: #7f8c8d; font-weight: 400;">
-                        Авторская методика <span class="author-name-inline">Игоря Демина</span>
-                    </small>
-                </h3>
-
+                <div class="badge">🧠 Инструмент для саморефлексии</div>
+                <h3>Исследуйте свой <span class="highlight">личностный профиль</span></h3>
                 <p>
-                    <strong>Что, если вы могли бы заглянуть в себя на 360°?</strong> 
-                    Тест <strong>The NATURE Code</strong> — это не просто опросник. Это авторская психологическая методика 
-                    <strong>Игоря Демина</strong>, основанная на современных исследованиях личности. 
-                    Она раскрывает <strong>6 ключевых измерений</strong> вашей психики, которые определяют:
+                    <strong>The NATURE Code</strong> — это 60 вопросов, которые помогут вам задуматься о своих
+                    личностных особенностях. Инструмент структурирует ваши ответы по <strong>6 измерениям</strong>,
+                    создавая пространство для самоисследования и рефлексии.
                 </p>
-
                 <div class="features">
                     <div class="feature-item">
-                        <span class="icon">⚡</span>
-                        <div class="label">Как вы восстанавливаете силы</div>
-                        <div class="desc">Энергетический потенциал и режим работы</div>
+                        <span class="icon">❤️</span>
+                        <div class="label">Заботливость</div>
+                        <div class="desc">Внимание к чувствам других</div>
                     </div>
                     <div class="feature-item">
-                        <span class="icon">👥</span>
-                        <div class="label">Как вы строите отношения</div>
-                        <div class="desc">Социальные стратегии и глубина связей</div>
+                        <span class="icon">⚡</span>
+                        <div class="label">Напористость</div>
+                        <div class="desc">Уверенность и инициатива</div>
                     </div>
                     <div class="feature-item">
                         <span class="icon">🧘</span>
-                        <div class="label">Как вы справляетесь со стрессом</div>
-                        <div class="desc">Эмоциональная устойчивость и саморегуляция</div>
+                        <div class="label">Стойкость</div>
+                        <div class="desc">Самообладание и устойчивость</div>
                     </div>
                     <div class="feature-item">
                         <span class="icon">🎨</span>
-                        <div class="label">Как вы решаете проблемы</div>
-                        <div class="desc">Творческий потенциал и гибкость мышления</div>
+                        <div class="label">Креативность</div>
+                        <div class="desc">Нестандартность мышления</div>
                     </div>
                     <div class="feature-item">
-                        <span class="icon">❤️</span>
-                        <div class="label">Как вы понимаете других</div>
-                        <div class="desc">Эмпатия и эмоциональный интеллект</div>
+                        <span class="icon">🌱</span>
+                        <div class="label">Восстановление</div>
+                        <div class="desc">Способность справляться</div>
                     </div>
                     <div class="feature-item">
-                        <span class="icon">🚀</span>
-                        <div class="label">Как вы влияете на мир</div>
-                        <div class="desc">Лидерский потенциал и инициативность</div>
+                        <span class="icon">👥</span>
+                        <div class="label">Социальность</div>
+                        <div class="desc">Потребность в общении</div>
                     </div>
+                </div>
+
+                <div class="disclaimer-box">
+                    <p><strong>📌 Важно понимать:</strong></p>
+                    <p>Этот инструмент не является научным психологическим тестом. Он не имеет клинической валидации и не может использоваться для постановки диагнозов или профессионального отбора.</p>
+                    <p><strong>Его цель — помочь вам задуматься о себе и начать диалог с самим собой или с психологом.</strong></p>
                 </div>
 
                 <div class="cta-text">
-                    <span class="emoji">🔍</span> 
-                    <strong>
-                        Всего 60 вопросов — и вы получите полный психологический портрет 
-                        от <span class="author-cta">Игоря Демина</span> с персональными рекомендациями!
-                    </strong>
-                    <span class="emoji">✨</span>
+                    🔍 60 вопросов — ваш профиль для самоисследования
                 </div>
             </div>
 
-            <h2>Добро пожаловать в The NATURE Code!</h2>
-            <p class="sub-text">Пожалуйста, представьтесь, чтобы начать</p>
-
+            <h2>Начните исследование</h2>
+            <p class="sub-text">Представьтесь, чтобы сохранить результат</p>
             <div class="name-input-group">
-                <input type="text" id="nameInput" placeholder="Введите ваше имя..." maxlength="50">
-                <button class="btn-start" onclick="startTest()">Начать тест →</button>
+                <input type="text" id="nameInput" placeholder="Ваше имя..." maxlength="50">
+                <button class="btn-start" onclick="startTest()">Начать →</button>
             </div>
-
-            <button class="history-btn" onclick="showHistory()">📋 Показать историю результатов</button>
+            <button class="history-btn" onclick="showHistory()">📋 История результатов</button>
             <div class="history-count" id="historyCount"></div>
         </div>
 
-        <!-- ===== ЭКРАН ТЕСТА ===== -->
+        <!-- ===== ТЕСТ ===== -->
         <div id="testScreen" class="hidden">
             <div class="progress-container">
-                <div class="progress-bar">
-                    <div class="fill" id="progressFill"></div>
-                </div>
+                <div class="progress-bar"><div class="fill" id="progressFill"></div></div>
                 <div class="progress-text">
                     <span id="questionProgress">Вопрос 1 из 60</span>
                     <span id="questionPercent">0%</span>
@@ -904,31 +1186,29 @@
 
             <div class="question-card">
                 <div class="question-number" id="questionNumber">Вопрос 1</div>
-                <div class="question-text" id="questionText">Загрузка вопроса...</div>
-
+                <div class="question-text" id="questionText">Загрузка...</div>
                 <div class="options" id="optionsContainer">
                     <button class="option-btn" data-value="1" onclick="selectOption(1)">
                         <span class="label">1</span>
-                        <span class="text">Полностью<br>не согласен</span>
+                        <span class="text">Совершенно<br>не про меня</span>
                     </button>
                     <button class="option-btn" data-value="2" onclick="selectOption(2)">
                         <span class="label">2</span>
-                        <span class="text">Не согласен</span>
+                        <span class="text">Скорее<br>не про меня</span>
                     </button>
                     <button class="option-btn" data-value="3" onclick="selectOption(3)">
                         <span class="label">3</span>
-                        <span class="text">Нейтрально</span>
+                        <span class="text">Иногда<br>бывает</span>
                     </button>
                     <button class="option-btn" data-value="4" onclick="selectOption(4)">
                         <span class="label">4</span>
-                        <span class="text">Согласен</span>
+                        <span class="text">Скорее<br>про меня</span>
                     </button>
                     <button class="option-btn" data-value="5" onclick="selectOption(5)">
                         <span class="label">5</span>
-                        <span class="text">Полностью<br>согласен</span>
+                        <span class="text">Точно<br>про меня</span>
                     </button>
                 </div>
-
                 <div class="nav-buttons">
                     <button class="btn btn-prev" id="prevBtn" onclick="prevQuestion()" disabled>← Назад</button>
                     <button class="btn btn-next" id="nextBtn" onclick="nextQuestion()">Далее →</button>
@@ -936,7 +1216,7 @@
             </div>
         </div>
 
-        <!-- ===== ЭКРАН РЕЗУЛЬТАТОВ ===== -->
+        <!-- ===== РЕЗУЛЬТАТЫ ===== -->
         <div id="resultsScreen" class="hidden results-screen">
             <div id="resultsContent"></div>
         </div>
@@ -945,101 +1225,144 @@
     <!-- ===== МОДАЛ ИСТОРИИ ===== -->
     <div class="history-modal" id="historyModal">
         <div class="history-content">
-            <h2>📊 История результатов</h2>
+            <h2>📋 История самоисследований</h2>
             <div id="historyList"></div>
             <div class="history-actions">
-                <button class="btn-clear-history" onclick="clearHistory()">🗑️ Очистить историю</button>
+                <button class="btn-clear-history" onclick="clearHistory()">🗑️ Очистить</button>
                 <button class="history-close" onclick="closeHistory()">Закрыть</button>
             </div>
         </div>
     </div>
 
     <script>
-        // ============================================================
-        // ДАННЫЕ
-        // ============================================================
+        // ================================================================
+        // THE NATURE CODE — ЭТИЧНЫЙ ИНСТРУМЕНТ ДЛЯ САМОРЕФЛЕКСИИ
+        // ================================================================
 
+        // ===== ОПИСАНИЕ ШКАЛ =====
         const SCALES = {
-            n_energy: { name: 'Энергичность', icon: '⚡', color: '#e74c3c' },
-            a_social: { name: 'Социальность', icon: '👥', color: '#2ecc71' },
-            t_stability: { name: 'Стабильность', icon: '🧘', color: '#2c3e50' },
-            u_creativity: { name: 'Креативность', icon: '🎨', color: '#1abc9c' },
-            r_empathy: { name: 'Эмпатичность', icon: '❤️', color: '#8e44ad' },
-            e_leadership: { name: 'Лидерство', icon: '🚀', color: '#f39c12' }
+            Nurturing: {
+                name: 'Заботливость',
+                short: 'N',
+                icon: '❤️',
+                color: '#8e44ad',
+                description: 'Склонность замечать и учитывать чувства других людей'
+            },
+            Assertiveness: {
+                name: 'Напористость',
+                short: 'A',
+                icon: '⚡',
+                color: '#f39c12',
+                description: 'Уверенность в себе и готовность проявлять инициативу'
+            },
+            Tenacity: {
+                name: 'Стойкость',
+                short: 'T',
+                icon: '🧘',
+                color: '#2c3e50',
+                description: 'Способность сохранять самообладание в сложных ситуациях'
+            },
+            Unconventionality: {
+                name: 'Креативность',
+                short: 'U',
+                icon: '🎨',
+                color: '#1abc9c',
+                description: 'Склонность к нестандартному мышлению и новым идеям'
+            },
+            Resilience: {
+                name: 'Восстановление',
+                short: 'R',
+                icon: '🌱',
+                color: '#e74c3c',
+                description: 'Способность справляться с трудностями и восстанавливаться'
+            },
+            Extraversion: {
+                name: 'Социальность',
+                short: 'E',
+                icon: '👥',
+                color: '#3498db',
+                description: 'Потребность в общении и социальной активности'
+            }
         };
 
+        // ===== ВОПРОСЫ (60) =====
         const QUESTIONS = [
-            // Энергичность (1-10)
-            { text: "Я просыпаюсь утром с ощущением бодрости и готовности к активному дню", scale: "n_energy", reversed: false },
-            { text: "В течение дня я часто испытываю упадок сил и усталость", scale: "n_energy", reversed: true },
-            { text: "Я способен продуктивно работать в течение длительного времени", scale: "n_energy", reversed: false },
-            { text: "После рабочего дня я чувствую себя полностью истощённым", scale: "n_energy", reversed: true },
-            { text: "Мне легко переключаться между различными видами деятельности", scale: "n_energy", reversed: false },
-            { text: "Мне требуется длительное время для вхождения в рабочий ритм", scale: "n_energy", reversed: true },
-            { text: "Мне нравится активный образ жизни и подвижные виды отдыха", scale: "n_energy", reversed: false },
-            { text: "Я предпочитаю пассивный отдых активным занятиям", scale: "n_energy", reversed: true },
-            { text: "Мой внутренний тонус обычно находится на высоком уровне", scale: "n_energy", reversed: false },
-            { text: "Я часто чувствую себя вялым и апатичным", scale: "n_energy", reversed: true },
-            // Социальность (11-20)
-            { text: "Я чувствую себя комфортно в окружении большого количества людей", scale: "a_social", reversed: false },
-            { text: "Я предпочитаю уединение шумным компаниям", scale: "a_social", reversed: true },
-            { text: "Мне легко находить общий язык с незнакомыми людьми", scale: "a_social", reversed: false },
-            { text: "Мне трудно начинать разговор с новыми людьми", scale: "a_social", reversed: true },
-            { text: "Я получаю удовольствие от нахождения в центре внимания", scale: "a_social", reversed: false },
-            { text: "Я предпочитаю оставаться в тени и наблюдать со стороны", scale: "a_social", reversed: true },
-            { text: "У меня широкий круг общения в разных социальных сферах", scale: "a_social", reversed: false },
-            { text: "Мой круг общения ограничен несколькими близкими людьми", scale: "a_social", reversed: true },
-            { text: "Я черпаю энергию в процессе социального взаимодействия", scale: "a_social", reversed: false },
-            { text: "После интенсивного общения я чувствую потребность в восстановлении", scale: "a_social", reversed: true },
-            // Стабильность (21-30)
-            { text: "Я сохраняю эмоциональное равновесие в стрессовых ситуациях", scale: "t_stability", reversed: false },
-            { text: "Неожиданные ситуации часто выводят меня из равновесия", scale: "t_stability", reversed: true },
-            { text: "Я уверен в своих силах и принимаемых решениях", scale: "t_stability", reversed: false },
-            { text: "Я часто сомневаюсь в правильности своих решений", scale: "t_stability", reversed: true },
-            { text: "Меня трудно вывести из состояния эмоционального баланса", scale: "t_stability", reversed: false },
-            { text: "Я остро реагирую на критику и замечания в свой адрес", scale: "t_stability", reversed: true },
-            { text: "Я способен контролировать свои эмоции в напряжённых ситуациях", scale: "t_stability", reversed: false },
-            { text: "В стрессовых ситуациях я теряю контроль над своими эмоциями", scale: "t_stability", reversed: true },
-            { text: "Я быстро восстанавливаюсь после неудач и разочарований", scale: "t_stability", reversed: false },
-            { text: "Неудачи и провалы надолго выводят меня из равновесия", scale: "t_stability", reversed: true },
-            // Креативность (31-40)
-            { text: "Мне нравится генерировать новые идеи и находить нестандартные решения", scale: "u_creativity", reversed: false },
-            { text: "Я предпочитаю использовать проверенные методы и алгоритмы", scale: "u_creativity", reversed: true },
-            { text: "Я вижу неочевидные связи и закономерности там, где другие их не замечают", scale: "u_creativity", reversed: false },
-            { text: "Я мыслю логически последовательно, без творческих отступлений", scale: "u_creativity", reversed: true },
-            { text: "Я получаю удовольствие от экспериментов и нового опыта", scale: "u_creativity", reversed: false },
-            { text: "Я предпочитаю действовать по инструкциям и установленным правилам", scale: "u_creativity", reversed: true },
-            { text: "У меня хорошо развито воображение, и я часто фантазирую", scale: "u_creativity", reversed: false },
-            { text: "Я реалист и предпочитаю оперировать фактами, а не гипотезами", scale: "u_creativity", reversed: true },
-            { text: "Я легко нахожу оригинальные решения сложных проблем", scale: "u_creativity", reversed: false },
-            { text: "Мне трудно выходить за рамки привычных способов решения", scale: "u_creativity", reversed: true },
-            // Эмпатичность (41-50)
-            { text: "Я тонко чувствую эмоциональное состояние окружающих", scale: "r_empathy", reversed: false },
-            { text: "Мне трудно понимать чувства и переживания других людей", scale: "r_empathy", reversed: true },
-            { text: "Мне важно поддерживать других и проявлять заботу о них", scale: "r_empathy", reversed: false },
-            { text: "Я часто не замечаю, когда кто-то нуждается в поддержке", scale: "r_empathy", reversed: true },
-            { text: "Люди доверяют мне и обращаются за эмоциональной поддержкой", scale: "r_empathy", reversed: false },
-            { text: "Мне трудно проявлять интерес к переживаниям других людей", scale: "r_empathy", reversed: true },
-            { text: "Я умею внимательно слушать и слышать собеседника", scale: "r_empathy", reversed: false },
-            { text: "Я часто перебиваю собеседника и не даю ему высказаться", scale: "r_empathy", reversed: true },
-            { text: "Я стараюсь понять точку зрения другого человека", scale: "r_empathy", reversed: false },
-            { text: "Я всегда настаиваю на своей точке зрения, игнорируя позицию других", scale: "r_empathy", reversed: true },
-            // Лидерство (51-60)
-            { text: "Я готов брать на себя ответственность и руководить группой", scale: "e_leadership", reversed: false },
-            { text: "В команде я чаще выполняю задачи, чем беру на себя руководство", scale: "e_leadership", reversed: true },
-            { text: "Я умею вдохновлять и мотивировать других людей", scale: "e_leadership", reversed: false },
-            { text: "Мне трудно влиять на мнение и решения окружающих", scale: "e_leadership", reversed: true },
-            { text: "Я быстро принимаю решения в сложных ситуациях", scale: "e_leadership", reversed: false },
-            { text: "Я долго колеблюсь перед принятием важных решений", scale: "e_leadership", reversed: true },
-            { text: "Я часто проявляю инициативу и предлагаю новые проекты", scale: "e_leadership", reversed: false },
-            { text: "Я предпочитаю следовать за лидером, а не быть им", scale: "e_leadership", reversed: true },
-            { text: "Я умею эффективно организовывать работу группы", scale: "e_leadership", reversed: false },
-            { text: "В командной работе я часто испытываю неуверенность", scale: "e_leadership", reversed: true }
+            // Nurturing
+            { text: 'Я замечаю, когда кто-то рядом нуждается в поддержке', scale: 'Nurturing', reversed: false },
+            { text: 'Мне трудно понять, что чувствуют другие люди', scale: 'Nurturing', reversed: true },
+            { text: 'Я стараюсь утешить расстроенного человека', scale: 'Nurturing', reversed: false },
+            { text: 'Чужие переживания оставляют меня равнодушным', scale: 'Nurturing', reversed: true },
+            { text: 'Ко мне часто обращаются за эмоциональной поддержкой', scale: 'Nurturing', reversed: false },
+            { text: 'Я редко задумываюсь о чувствах других', scale: 'Nurturing', reversed: true },
+            { text: 'Мне интересны чувства и переживания близких', scale: 'Nurturing', reversed: false },
+            { text: 'Я часто не замечаю, когда кто-то расстроен', scale: 'Nurturing', reversed: true },
+            { text: 'Я создаю атмосферу доверия в общении', scale: 'Nurturing', reversed: false },
+            { text: 'Мне трудно сопереживать даже близким людям', scale: 'Nurturing', reversed: true },
+
+            // Assertiveness
+            { text: 'В спорах я обычно отстаиваю свою точку зрения', scale: 'Assertiveness', reversed: false },
+            { text: 'Я предпочитаю подчиняться, а не руководить', scale: 'Assertiveness', reversed: true },
+            { text: 'Я легко беру на себя инициативу', scale: 'Assertiveness', reversed: false },
+            { text: 'Мне трудно принимать решения', scale: 'Assertiveness', reversed: true },
+            { text: 'Я уверен в своих силах', scale: 'Assertiveness', reversed: false },
+            { text: 'Я часто сомневаюсь в правильности своих действий', scale: 'Assertiveness', reversed: true },
+            { text: 'Мне нравится влиять на мнение других', scale: 'Assertiveness', reversed: false },
+            { text: 'В команде я предпочитаю оставаться в тени', scale: 'Assertiveness', reversed: true },
+            { text: 'Я быстро принимаю решения', scale: 'Assertiveness', reversed: false },
+            { text: 'Я часто чувствую неуверенность', scale: 'Assertiveness', reversed: true },
+
+            // Tenacity
+            { text: 'В стрессовых ситуациях я сохраняю спокойствие', scale: 'Tenacity', reversed: false },
+            { text: 'Неожиданности выводят меня из равновесия', scale: 'Tenacity', reversed: true },
+            { text: 'Я контролирую эмоции в напряжённой обстановке', scale: 'Tenacity', reversed: false },
+            { text: 'Критика сильно меня расстраивает', scale: 'Tenacity', reversed: true },
+            { text: 'Меня трудно вывести из себя', scale: 'Tenacity', reversed: false },
+            { text: 'Я остро реагирую на замечания', scale: 'Tenacity', reversed: true },
+            { text: 'Я сохраняю самообладание в любой ситуации', scale: 'Tenacity', reversed: false },
+            { text: 'Неудачи сильно влияют на моё настроение', scale: 'Tenacity', reversed: true },
+            { text: 'Я умею управлять своим эмоциональным состоянием', scale: 'Tenacity', reversed: false },
+            { text: 'Я часто теряю контроль над эмоциями', scale: 'Tenacity', reversed: true },
+
+            // Unconventionality
+            { text: 'Мне нравится искать нестандартные решения', scale: 'Unconventionality', reversed: false },
+            { text: 'Я предпочитаю проверенные методы новым', scale: 'Unconventionality', reversed: true },
+            { text: 'Я замечаю неочевидные связи между вещами', scale: 'Unconventionality', reversed: false },
+            { text: 'Я мыслю логически, без творческих отступлений', scale: 'Unconventionality', reversed: true },
+            { text: 'Мне нравится экспериментировать', scale: 'Unconventionality', reversed: false },
+            { text: 'Я предпочитаю следовать инструкциям', scale: 'Unconventionality', reversed: true },
+            { text: 'У меня богатое воображение', scale: 'Unconventionality', reversed: false },
+            { text: 'Я ориентируюсь только на факты', scale: 'Unconventionality', reversed: true },
+            { text: 'Я легко нахожу оригинальные решения', scale: 'Unconventionality', reversed: false },
+            { text: 'Мне трудно выходить за рамки привычного', scale: 'Unconventionality', reversed: true },
+
+            // Resilience
+            { text: 'После неудачи я быстро прихожу в себя', scale: 'Resilience', reversed: false },
+            { text: 'Неудачи надолго выбивают меня из колеи', scale: 'Resilience', reversed: true },
+            { text: 'Я извлекаю уроки из сложных ситуаций', scale: 'Resilience', reversed: false },
+            { text: 'Я долго переживаю даже небольшие неудачи', scale: 'Resilience', reversed: true },
+            { text: 'Я сохраняю оптимизм в трудных обстоятельствах', scale: 'Resilience', reversed: false },
+            { text: 'Проблемы часто кажутся непреодолимыми', scale: 'Resilience', reversed: true },
+            { text: 'Я адаптируюсь к изменениям', scale: 'Resilience', reversed: false },
+            { text: 'Перемены вызывают у меня стресс', scale: 'Resilience', reversed: true },
+            { text: 'Я быстро восстанавливаюсь после потрясений', scale: 'Resilience', reversed: false },
+            { text: 'После неудач я чувствую себя подавленным', scale: 'Resilience', reversed: true },
+
+            // Extraversion
+            { text: 'Я чувствую себя комфортно в больших компаниях', scale: 'Extraversion', reversed: false },
+            { text: 'Я предпочитаю уединение шумным компаниям', scale: 'Extraversion', reversed: true },
+            { text: 'Я легко знакомлюсь с новыми людьми', scale: 'Extraversion', reversed: false },
+            { text: 'Мне трудно начинать разговор с незнакомцами', scale: 'Extraversion', reversed: true },
+            { text: 'Общение заряжает меня энергией', scale: 'Extraversion', reversed: false },
+            { text: 'После общения я чувствую усталость', scale: 'Extraversion', reversed: true },
+            { text: 'Я люблю быть в центре внимания', scale: 'Extraversion', reversed: false },
+            { text: 'Я чувствую дискомфорт в незнакомых компаниях', scale: 'Extraversion', reversed: true },
+            { text: 'Я активно ищу социальные контакты', scale: 'Extraversion', reversed: false },
+            { text: 'Мне достаточно своего круга близких друзей', scale: 'Extraversion', reversed: true }
         ];
 
-        // ============================================================
+        // ================================================================
         // СОСТОЯНИЕ
-        // ============================================================
+        // ================================================================
 
         let state = {
             userName: '',
@@ -1048,73 +1371,59 @@
             resultsHistory: []
         };
 
-        // ============================================================
-        // ИСТОРИЯ (localStorage)
-        // ============================================================
+        // ================================================================
+        // ХРАНИЛИЩЕ
+        // ================================================================
 
         function loadHistory() {
             try {
-                const data = localStorage.getItem('nature_results');
-                if (data) {
-                    state.resultsHistory = JSON.parse(data);
-                }
-            } catch (e) {
-                state.resultsHistory = [];
-            }
+                const data = localStorage.getItem('nature_reflection_v4');
+                state.resultsHistory = data ? JSON.parse(data) : [];
+            } catch { state.resultsHistory = []; }
             updateHistoryCount();
         }
 
         function saveHistory() {
             try {
-                localStorage.setItem('nature_results', JSON.stringify(state.resultsHistory));
-            } catch (e) {
-                console.error('Ошибка сохранения истории:', e);
-            }
+                localStorage.setItem('nature_reflection_v4', JSON.stringify(state.resultsHistory));
+            } catch {}
             updateHistoryCount();
         }
 
         function updateHistoryCount() {
             const el = document.getElementById('historyCount');
             if (el) {
-                const count = state.resultsHistory.length;
-                el.textContent = count > 0 ? `📊 В базе данных ${count} сохранённых результатов` : '';
+                el.textContent = state.resultsHistory.length > 0 ?
+                    '📋 ' + state.resultsHistory.length + ' сохранённых результатов' : '';
             }
         }
-
-        // ============================================================
-        // ОЧИСТКА ИСТОРИИ
-        // ============================================================
 
         function clearHistory() {
             if (state.resultsHistory.length === 0) {
-                alert('📭 История уже пуста.');
+                alert('История пуста.');
                 return;
             }
-
-            if (confirm('⚠️ Вы уверены, что хотите полностью очистить историю результатов?\nЭто действие нельзя отменить!')) {
-                state.resultsHistory = [];
-                saveHistory();
-                showHistory();
-                alert('✅ История результатов успешно очищена!');
-            }
+            if (!confirm('Очистить историю? Это действие нельзя отменить.')) return;
+            state.resultsHistory = [];
+            saveHistory();
+            showHistory();
         }
 
-        // ============================================================
+        // ================================================================
+        // УПРАВЛЕНИЕ ЭКРАНАМИ
+        // ================================================================
+
         function showScreen(screenId) {
             ['nameScreen', 'testScreen', 'resultsScreen'].forEach(id => {
                 document.getElementById(id).classList.toggle('hidden', id !== screenId);
             });
         }
 
-        // ============================================================
-        // СТАРТ
-        // ============================================================
-
         function startTest() {
             const input = document.getElementById('nameInput');
             const name = input.value.trim();
             if (!name) {
-                alert('Пожалуйста, введите ваше имя!');
+                alert('Пожалуйста, введите ваше имя.');
                 input.focus();
                 return;
             }
@@ -1125,47 +1434,42 @@
             renderQuestion();
         }
 
-        document.getElementById('nameInput').addEventListener('keydown', function(e) {
+        document.getElementById('nameInput').addEventListener('keydown', e => {
             if (e.key === 'Enter') startTest();
         });
 
-        // ============================================================
-        // ОТОБРАЖЕНИЕ ВОПРОСА
-        // ============================================================
+        // ================================================================
+        // ОТОБРАЖЕНИЕ ВОПРОСОВ
+        // ================================================================
 
         function renderQuestion() {
             const idx = state.currentQuestion;
             const q = QUESTIONS[idx];
             const total = QUESTIONS.length;
 
-            document.getElementById('questionNumber').textContent = `Вопрос ${idx + 1}`;
+            document.getElementById('questionNumber').textContent = 'Вопрос ' + (idx + 1) + ' из ' + total;
             document.getElementById('questionText').textContent = q.text;
 
             const progress = ((idx + 1) / total) * 100;
             document.getElementById('progressFill').style.width = progress + '%';
-            document.getElementById('questionProgress').textContent = `Вопрос ${idx + 1} из ${total}`;
+            document.getElementById('questionProgress').textContent = 'Вопрос ' + (idx + 1) + ' из ' + total;
             document.getElementById('questionPercent').textContent = Math.round(progress) + '%';
 
-            const savedAnswer = state.answers[idx];
             document.querySelectorAll('.option-btn').forEach(btn => {
-                btn.classList.toggle('selected', parseInt(btn.dataset.value) === savedAnswer);
+                btn.classList.toggle('selected', parseInt(btn.dataset.value) === state.answers[idx]);
             });
 
             document.getElementById('prevBtn').disabled = idx === 0;
 
             const nextBtn = document.getElementById('nextBtn');
             if (idx === total - 1) {
-                nextBtn.textContent = 'Завершить тест ✓';
+                nextBtn.textContent = 'Завершить ✓';
                 nextBtn.className = 'btn btn-finish';
             } else {
                 nextBtn.textContent = 'Далее →';
                 nextBtn.className = 'btn btn-next';
             }
         }
-
-        // ============================================================
-        // ВЫБОР ОТВЕТА
-        // ============================================================
 
         function selectOption(value) {
             state.answers[state.currentQuestion] = value;
@@ -1174,14 +1478,10 @@
             });
         }
 
-        // ============================================================
-        // НАВИГАЦИЯ
-        // ============================================================
-
         function nextQuestion() {
             const idx = state.currentQuestion;
             if (state.answers[idx] === 0) {
-                alert('Пожалуйста, выберите вариант ответа перед продолжением.');
+                alert('Выберите вариант ответа.');
                 return;
             }
 
@@ -1191,7 +1491,7 @@
                     .filter(v => v !== null);
 
                 if (missing.length > 0) {
-                    alert(`Вы не ответили на вопросы: ${missing.join(', ')}.\nПожалуйста, вернитесь и ответьте на них.`);
+                    alert('Вы не ответили на вопросы: ' + missing.join(', ') + '.\nВернитесь и ответьте на них.');
                     state.currentQuestion = missing[0] - 1;
                     renderQuestion();
                     return;
@@ -1205,36 +1505,27 @@
 
         function prevQuestion() {
             if (state.currentQuestion > 0) {
-                const currentAnswer = state.answers[state.currentQuestion];
-                if (currentAnswer === 0) {
-                    if (!confirm('Вы не выбрали ответ. Перейти к предыдущему вопросу без сохранения?')) {
-                        return;
-                    }
-                }
                 state.currentQuestion--;
                 renderQuestion();
             }
         }
 
-        // Клавиши
         document.addEventListener('keydown', function(e) {
-            if (document.getElementById('testScreen').classList.contains('hidden')) return;
-            if (e.key === 'ArrowLeft') prevQuestion();
-            if (e.key === 'ArrowRight') nextQuestion();
-            if (e.key >= '1' && e.key <= '5') {
-                selectOption(parseInt(e.key));
+            if (!document.getElementById('testScreen').classList.contains('hidden')) {
+                if (e.key === 'ArrowLeft') prevQuestion();
+                if (e.key === 'ArrowRight') nextQuestion();
+                if (e.key >= '1' && e.key <= '5') selectOption(parseInt(e.key));
             }
+            if (e.key === 'Escape') closeHistory();
         });
 
-        // ============================================================
-        // РАСЧЁТ РЕЗУЛЬТАТОВ
-        // ============================================================
+        // ================================================================
+        // РАСЧЁТ БАЛЛОВ
+        // ================================================================
 
         function calculateScores() {
-            const scores = {
-                n_energy: 0, a_social: 0, t_stability: 0,
-                u_creativity: 0, r_empathy: 0, e_leadership: 0
-            };
+            const scores = {};
+            for (const key of Object.keys(SCALES)) scores[key] = 0;
 
             QUESTIONS.forEach((q, i) => {
                 let answer = state.answers[i];
@@ -1245,210 +1536,591 @@
             return scores;
         }
 
-        function getScaleDescription(scale, score) {
+        function calculatePercentile(raw, maxScore) {
+            const percent = Math.round((raw / maxScore) * 100);
+            return Math.min(100, Math.max(0, percent));
+        }
+
+        function getLevel(percentile) {
+            if (percentile >= 75) return { label: 'Выражено', emoji: '⬆️' };
+            if (percentile >= 50) return { label: 'Умеренно', emoji: '➡️' };
+            if (percentile >= 25) return { label: 'Умеренно-слабо', emoji: '↘️' };
+            return { label: 'Слабо выражено', emoji: '⬇️' };
+        }
+
+        // ================================================================
+        // ИНТЕРПРЕТАЦИИ
+        // ================================================================
+
+        function getInterpretation(scale, percentile) {
             const descriptions = {
-                n_energy: {
-                    high: { level: 'Высокий уровень', title: 'Энергичный и жизнестойкий', desc: 'Вы демонстрируете высокий уровень психоэнергетического потенциала. Ваша стрессоустойчивость и способность к восстановлению ресурсов позволяют эффективно функционировать в условиях повышенных нагрузок.' },
-                    medium_high: { level: 'Умеренный уровень', title: 'Активный и продуктивный', desc: 'Вы способны поддерживать оптимальный уровень активности в течение дня. Ваша продуктивность достаточно высока, однако для восстановления ресурсов вам необходим полноценный отдых.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Уравновешенный и размеренный', desc: 'Вы предпочитаете спокойный и размеренный темп жизни. Вам важно поддерживать баланс между активностью и восстановлением.' },
-                    low: { level: 'Низкий уровень', title: 'Спокойный и релаксирующий', desc: 'Вы предпочитаете спокойную и расслабленную атмосферу. Вам требуется больше времени на восстановление после нагрузок.' }
+                Nurturing: {
+                    high: {
+                        title: 'Вы склонны замечать чувства других',
+                        desc: 'Вы обращаете внимание на эмоциональное состояние окружающих и часто готовы предложить поддержку. Это качество помогает вам строить тёплые отношения.'
+                    },
+                    medium: {
+                        title: 'Вы избирательно внимательны к другим',
+                        desc: 'Вы замечаете чувства близких людей, но не всегда включаетесь в переживания незнакомцев. Вы сохраняете баланс между эмпатией и личными границами.'
+                    },
+                    low: {
+                        title: 'Вы больше сосредоточены на себе',
+                        desc: 'Вы реже замечаете эмоциональные сигналы других людей. Это может быть связано с вашей сосредоточенностью на собственных задачах или предпочтением логики.'
+                    }
                 },
-                a_social: {
-                    high: { level: 'Высокий уровень', title: 'Социально активный', desc: 'Вы обладаете развитыми социальными навыками и высокой потребностью в общении. Вы легко устанавливаете контакты, чувствуете себя комфортно в любом обществе.' },
-                    medium_high: { level: 'Умеренно высокий уровень', title: 'Коммуникабельный', desc: 'Вы умеете находить общий язык с разными людьми и поддерживать беседу. Вам комфортно как в больших компаниях, так и в узком кругу близких.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Сдержанный и избирательный', desc: 'Вы предпочитаете качество общения его количеству. Вам комфортнее в небольших компаниях или наедине с близкими.' },
-                    low: { level: 'Низкий уровень', title: 'Интровертивный и самодостаточный', desc: 'Вы чувствуете себя комфортно в одиночестве и не испытываете потребности в постоянном общении.' }
+                Assertiveness: {
+                    high: {
+                        title: 'Вы уверены и инициативны',
+                        desc: 'Вы склонны брать на себя инициативу и отстаивать свои интересы. Вам комфортно в роли лидера или организатора.'
+                    },
+                    medium: {
+                        title: 'Вы гибки в проявлении инициативы',
+                        desc: 'Вы можете проявлять напористость, когда это необходимо, но также умеете подстраиваться под ситуацию и работать в команде.'
+                    },
+                    low: {
+                        title: 'Вы предпочитаете следовать за другими',
+                        desc: 'Вам комфортнее в роли участника, чем лидера. Вы цените сотрудничество и реже берёте на себя ответственность за решения.'
+                    }
                 },
-                t_stability: {
-                    high: { level: 'Высокий уровень', title: 'Эмоционально стабильный', desc: 'Ваша эмоциональная устойчивость является важным ресурсом. Вы сохраняете психологическое равновесие в стрессовых ситуациях, быстро восстанавливаетесь после неудач.' },
-                    medium_high: { level: 'Умеренно высокий уровень', title: 'Психологически устойчивый', desc: 'Вы хорошо справляетесь со стрессом и умеете контролировать эмоции. В сложных ситуациях вы сохраняете спокойствие и рассудительность.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Эмоционально восприимчивый', desc: 'Вы тонко чувствуете и переживаете происходящее вокруг. Вам важно развивать навыки управления стрессом.' },
-                    low: { level: 'Низкий уровень', title: 'Эмоционально чувствительный', desc: 'Вы обладаете высокой эмоциональной чувствительностью. Вам важно работать над психологической устойчивостью.' }
+                Tenacity: {
+                    high: {
+                        title: 'Вы сохраняете спокойствие в стрессе',
+                        desc: 'Вы редко теряете самообладание даже в сложных ситуациях. Это помогает вам оставаться продуктивным и поддерживать других.'
+                    },
+                    medium: {
+                        title: 'Вы устойчивы, но чувствительны к стрессу',
+                        desc: 'Вы справляетесь с большинством стрессовых ситуаций, но сильное напряжение может временно вывести вас из равновесия.'
+                    },
+                    low: {
+                        title: 'Вы остро реагируете на стресс',
+                        desc: 'Вы чувствительны к внешним нагрузкам и критике. Вам может требоваться больше времени на восстановление после сложных ситуаций.'
+                    }
                 },
-                u_creativity: {
-                    high: { level: 'Высокий уровень', title: 'Креативный и инновационный', desc: 'Ваше творческое мышление является значительным преимуществом. Вы генерируете нестандартные идеи, находите оригинальные решения и не боитесь экспериментировать.' },
-                    medium_high: { level: 'Умеренно высокий уровень', title: 'Творчески мыслящий', desc: 'Вы обладаете развитым творческим потенциалом. Вы умеете находить нестандартные решения и рассматривать ситуации с различных точек зрения.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Практичный и рациональный', desc: 'Вы предпочитаете логику и проверенные методы творческим экспериментам. Вы цените практичность и эффективность решений.' },
-                    low: { level: 'Низкий уровень', title: 'Консервативный и последовательный', desc: 'Вы придерживаетесь проверенных методов и традиционных подходов. Вы цените стабильность и предсказуемость.' }
+                Unconventionality: {
+                    high: {
+                        title: 'Вы склонны мыслить нестандартно',
+                        desc: 'Вы любите искать новые подходы и экспериментировать. Ваше воображение помогает находить оригинальные решения.'
+                    },
+                    medium: {
+                        title: 'Вы сочетаете логику и креативность',
+                        desc: 'Вы открыты новым идеям, но также цените проверенные методы. Вы умеете находить баланс между инновациями и практичностью.'
+                    },
+                    low: {
+                        title: 'Вы предпочитаете проверенные пути',
+                        desc: 'Вы цените стабильность и предсказуемость. Вы доверяете проверенным методам и реже ищете альтернативные решения.'
+                    }
                 },
-                r_empathy: {
-                    high: { level: 'Высокий уровень', title: 'Глубоко эмпатичный', desc: 'Ваша эмпатия является важным личностным ресурсом. Вы тонко чувствуете эмоциональное состояние других людей, искренне сопереживаете и готовы оказать поддержку.' },
-                    medium_high: { level: 'Умеренно высокий уровень', title: 'Понимающий и отзывчивый', desc: 'Вы хорошо понимаете чувства и потребности других людей. Вы умеете слушать и поддерживать в трудную минуту.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Рассудительный и объективный', desc: 'Вы предпочитаете руководствоваться логикой и фактами, а не эмоциями. Вы способны сохранять объективность в сложных ситуациях.' },
-                    low: { level: 'Низкий уровень', title: 'Рациональный и сдержанный', desc: 'Вы принимаете решения на основе логики и фактов. Вы не склонны к эмоциональной вовлечённости в проблемы других.' }
+                Resilience: {
+                    high: {
+                        title: 'Вы быстро восстанавливаетесь после неудач',
+                        desc: 'Вы умеете извлекать уроки из трудностей и сохранять оптимизм. Это помогает вам двигаться вперёд даже после серьёзных испытаний.'
+                    },
+                    medium: {
+                        title: 'Вы справляетесь, но вам нужно время',
+                        desc: 'Вы способны преодолевать трудности, но для восстановления вам требуется время и поддержка. Вы умеете перерабатывать негативный опыт.'
+                    },
+                    low: {
+                        title: 'Неудачи сильно влияют на вас',
+                        desc: 'Вы тяжело переживаете трудности и можете застревать в негативных переживаниях. Вам может быть полезно развивать навыки саморегуляции.'
+                    }
                 },
-                e_leadership: {
-                    high: { level: 'Высокий уровень', title: 'Прирождённый лидер', desc: 'У вас выражены лидерские качества. Вы способны брать на себя ответственность, вдохновлять и вести за собой людей.' },
-                    medium_high: { level: 'Умеренно высокий уровень', title: 'Уверенный и инициативный', desc: 'Вы проявляете лидерские качества в соответствующих ситуациях. Вы способны брать инициативу и влиять на ход событий.' },
-                    medium_low: { level: 'Умеренно низкий уровень', title: 'Спокойный исполнитель', desc: 'Вы предпочитаете работать в команде, где руководство берёт на себя другой человек. Вы ответственно выполняете свои задачи.' },
-                    low: { level: 'Низкий уровень', title: 'Последовательный и надёжный', desc: 'Вы чувствуете себя комфортнее в роли исполнителя. Вы предпочитаете следовать указаниям и не брать на себя лишнюю ответственность.' }
+                Extraversion: {
+                    high: {
+                        title: 'Вы энергичны в общении',
+                        desc: 'Вы любите быть среди людей, легко заводите знакомства и получаете энергию от социального взаимодействия.'
+                    },
+                    medium: {
+                        title: 'Вы балансируете между общением и уединением',
+                        desc: 'Вы комфортно чувствуете себя как в компании, так и наедине с собой. Вы гибко выбираете уровень социальной активности.'
+                    },
+                    low: {
+                        title: 'Вы предпочитаете уединение',
+                        desc: 'Вам комфортнее в небольшом кругу близких людей. Шумные компании и новые знакомства могут вас утомлять.'
+                    }
                 }
             };
 
-            const d = descriptions[scale];
-            if (score >= 40) return d.high;
-            if (score >= 30) return d.medium_high;
-            if (score >= 20) return d.medium_low;
-            return d.low;
+            const scaleDesc = descriptions[scale];
+            if (percentile >= 60) return scaleDesc.high;
+            if (percentile >= 40) return scaleDesc.medium;
+            return scaleDesc.low;
         }
 
-        function getGeneralProfile(scores) {
-            const maxScore = Math.max(...Object.values(scores));
-            const threshold = 40;
-            const profiles = [];
+        function getGeneralProfile(scores, maxScore) {
+            const percentiles = {};
+            for (const [key, value] of Object.entries(scores)) {
+                percentiles[key] = calculatePercentile(value, maxScore);
+            }
 
-            if (scores.n_energy >= threshold || scores.n_energy === maxScore) profiles.push('энергичный и активный');
-            if (scores.a_social >= threshold || scores.a_social === maxScore) profiles.push('социальный и коммуникабельный');
-            if (scores.t_stability >= threshold || scores.t_stability === maxScore) profiles.push('стабильный и уравновешенный');
-            if (scores.u_creativity >= threshold || scores.u_creativity === maxScore) profiles.push('креативный и нестандартный');
-            if (scores.r_empathy >= threshold || scores.r_empathy === maxScore) profiles.push('эмпатичный и чуткий');
-            if (scores.e_leadership >= threshold || scores.e_leadership === maxScore) profiles.push('лидер и организатор');
+            const sorted = Object.entries(percentiles).sort((a, b) => b[1] - a[1]);
+            const highest = sorted[0][0];
 
-            if (profiles.length === 0) return 'сбалансированный тип личности (Гармоничная NATURE)';
-            if (profiles.length === 1) return `ярко выраженный ${profiles[0]} тип`;
-            return 'гармоничная личность, сочетающая черты: ' + profiles.slice(0, -1).join(', ') + ' и ' + profiles[profiles.length - 1];
+            if (sorted[0][1] >= 65 && sorted[1][1] >= 60) {
+                return 'Наиболее выражены: ' + SCALES[highest].name + ' и ' + SCALES[sorted[1][0]].name;
+            }
+            if (sorted[0][1] >= 60) {
+                return 'Наиболее выражена: ' + SCALES[highest].name;
+            }
+            return 'Сбалансированный профиль (без ярко выраженных черт)';
         }
 
-        function getRecommendations(scores) {
-            const recs = [];
-            if (scores.n_energy <= 20) recs.push('Для повышения энергетического тонуса рекомендуется уделять внимание регулярной физической активности, соблюдать режим сна и питания.');
-            if (scores.n_energy >= 40) recs.push('Ваша высокая энергичность — значительный ресурс. Направляйте её на достижение важных целей, но не забывайте о необходимости полноценного отдыха.');
-            if (scores.a_social <= 20) recs.push('Рекомендуется постепенное расширение круга общения. Начните с небольших групп по интересам, где вы чувствуете себя комфортно.');
-            if (scores.a_social >= 40) recs.push('Ваша социальная активность способствует развитию профессиональных и личных связей. Используйте это качество для построения полезных контактов.');
-            if (scores.t_stability <= 20) recs.push('Для улучшения эмоциональной стабильности рекомендуется освоить техники релаксации и медитации.');
-            if (scores.t_stability >= 40) recs.push('Ваша эмоциональная стабильность — ценный ресурс для окружающих. Помогайте другим сохранять спокойствие в стрессовых ситуациях.');
-            if (scores.u_creativity <= 20) recs.push('Для развития креативности рекомендуется пробовать новые виды деятельности, читать книги разных жанров, посещать культурные мероприятия.');
-            if (scores.u_creativity >= 40) recs.push('Ваша креативность — важный актив. Используйте её для решения сложных задач, но не забывайте проверять идеи на практическую реализуемость.');
-            if (scores.r_empathy <= 20) recs.push('Для развития эмпатии рекомендуется практиковать активное слушание. Старайтесь понять точку зрения другого человека.');
-            if (scores.r_empathy >= 40) recs.push('Ваша эмпатия помогает создавать глубокие и доверительные отношения. Используйте эту способность для поддержки окружающих.');
-            if (scores.e_leadership <= 20) recs.push('Для развития лидерских качеств рекомендуется брать на себя управление небольшими проектами.');
-            if (scores.e_leadership >= 40) recs.push('Ваши лидерские качества — значительная сила. Берите на себя ответственность в важных проектах и вдохновляйте других своим примером.');
-            return recs;
+        // ================================================================
+        // РАДАРНАЯ ДИАГРАММА
+        // ================================================================
+
+        function drawRadar(canvas, scores, maxScore) {
+            const ctx = canvas.getContext('2d');
+            const width = canvas.width;
+            const height = canvas.height;
+            const centerX = width / 2;
+            const centerY = height / 2;
+            const radius = Math.min(width, height) * 0.35;
+
+            const scaleKeys = Object.keys(SCALES);
+            const numScales = scaleKeys.length;
+            const angleStep = (Math.PI * 2) / numScales;
+
+            const percentiles = {};
+            for (const key of scaleKeys) {
+                percentiles[key] = calculatePercentile(scores[key], maxScore);
+            }
+
+            ctx.clearRect(0, 0, width, height);
+
+            // Сетка
+            for (let level = 1; level <= 5; level++) {
+                const r = (radius / 5) * level;
+                ctx.beginPath();
+                for (let i = 0; i < numScales; i++) {
+                    const angle = -Math.PI / 2 + i * angleStep;
+                    const x = centerX + r * Math.cos(angle);
+                    const y = centerY + r * Math.sin(angle);
+                    i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+                }
+                ctx.closePath();
+                ctx.strokeStyle = '#e0e4e8';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+            }
+
+            // Линии
+            for (let i = 0; i < numScales; i++) {
+                const angle = -Math.PI / 2 + i * angleStep;
+                ctx.beginPath();
+                ctx.moveTo(centerX, centerY);
+                ctx.lineTo(centerX + radius * Math.cos(angle), centerY + radius * Math.sin(angle));
+                ctx.strokeStyle = '#e0e4e8';
+                ctx.lineWidth = 1;
+                ctx.stroke();
+
+                const labelR = radius + 30;
+                const labelX = centerX + labelR * Math.cos(angle);
+                const labelY = centerY + labelR * Math.sin(angle);
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = 'bold 13px Segoe UI, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(SCALES[scaleKeys[i]].short, labelX, labelY);
+            }
+
+            // Профиль
+            ctx.beginPath();
+            for (let i = 0; i < numScales; i++) {
+                const angle = -Math.PI / 2 + i * angleStep;
+                const r = Math.min(radius, (percentiles[scaleKeys[i]] / 100) * radius);
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+                i === 0 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+            }
+            ctx.closePath();
+
+            ctx.fillStyle = 'rgba(243, 156, 18, 0.15)';
+            ctx.fill();
+            ctx.strokeStyle = '#f39c12';
+            ctx.lineWidth = 3;
+            ctx.stroke();
+
+            // Точки
+            for (let i = 0; i < numScales; i++) {
+                const angle = -Math.PI / 2 + i * angleStep;
+                const r = Math.min(radius, (percentiles[scaleKeys[i]] / 100) * radius);
+                const x = centerX + r * Math.cos(angle);
+                const y = centerY + r * Math.sin(angle);
+
+                ctx.beginPath();
+                ctx.arc(x, y, 5, 0, Math.PI * 2);
+                ctx.fillStyle = '#f39c12';
+                ctx.fill();
+                ctx.strokeStyle = 'white';
+                ctx.lineWidth = 2;
+                ctx.stroke();
+
+                const labelR2 = r + 18;
+                const labelX2 = centerX + labelR2 * Math.cos(angle);
+                const labelY2 = centerY + labelR2 * Math.sin(angle);
+                ctx.fillStyle = '#2c3e50';
+                ctx.font = 'bold 11px Segoe UI, sans-serif';
+                ctx.textAlign = 'center';
+                ctx.textBaseline = 'middle';
+                ctx.fillText(percentiles[scaleKeys[i]] + '%', labelX2, labelY2);
+            }
         }
 
-        // ============================================================
+        // ================================================================
         // ПОКАЗ РЕЗУЛЬТАТОВ
-        // ============================================================
+        // ================================================================
 
         function showResults() {
             const scores = calculateScores();
-            const profile = getGeneralProfile(scores);
-            const recommendations = getRecommendations(scores);
+            const maxScore = 50;
             const now = new Date();
-            const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' });
+            const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit',
+                minute: '2-digit' });
 
-            // Сохраняем
+            const profile = getGeneralProfile(scores, maxScore);
+
+            const percentiles = {};
+            for (const [key, value] of Object.entries(scores)) {
+                percentiles[key] = calculatePercentile(value, maxScore);
+            }
+
             state.resultsHistory.push({
                 name: state.userName,
                 date: dateStr,
                 timestamp: now.toISOString(),
                 scores: scores,
+                percentiles: percentiles,
                 general_profile: profile
             });
             saveHistory();
 
             let html = `
                 <div class="results-header">
-                    <h2>
-                        <span class="brand">The</span>
-                        <span class="brand-highlight">NATURE</span>
-                        <span class="brand">Code</span>
-                        <span class="author">
-                            <span class="by">by</span>
-                            <span class="name">Igor Demin</span>
-                        </span>
-                    </h2>
-                    <div class="user-name">Результаты теста для: ${state.userName}</div>
+                    <h2>The <span class="brand-highlight">NATURE</span> Code</h2>
+                    <div class="user-name">${state.userName}</div>
                     <div class="date">${dateStr}</div>
-                    <div class="profile">${profile.toUpperCase()}</div>
+                    <div class="profile">${profile}</div>
+                    <div class="disclaimer-badge">
+                        ⚖️ Результаты — для саморефлексии, не являются диагнозом
+                    </div>
                 </div>
             `;
 
-            const scaleNames = {
-                n_energy: 'ЭНЕРГИЧНОСТЬ',
-                a_social: 'СОЦИАЛЬНОСТЬ',
-                t_stability: 'СТАБИЛЬНОСТЬ',
-                u_creativity: 'КРЕАТИВНОСТЬ',
-                r_empathy: 'ЭМПАТИЧНОСТЬ',
-                e_leadership: 'ЛИДЕРСТВО'
-            };
+            // Статистика
+            const allPercentiles = Object.values(percentiles);
+            const avgP = allPercentiles.reduce((a, b) => a + b, 0) / allPercentiles.length;
+            const minP = Math.min(...allPercentiles);
+            const maxP = Math.max(...allPercentiles);
+
+            html += `
+                <div class="statistics-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:15px;margin-bottom:25px;">
+                    <div class="stat-card" style="background:white;border:1px solid #e8ecf0;border-radius:12px;padding:18px;text-align:center;">
+                        <div class="stat-value" style="font-size:26px;font-weight:800;color:#2c3e50;">${Math.round(avgP)}%</div>
+                        <div class="stat-label" style="font-size:14px;color:#7f8c8d;">Средний уровень</div>
+                    </div>
+                    <div class="stat-card" style="background:white;border:1px solid #e8ecf0;border-radius:12px;padding:18px;text-align:center;">
+                        <div class="stat-value" style="font-size:26px;font-weight:800;color:#2c3e50;">${minP}%</div>
+                        <div class="stat-label" style="font-size:14px;color:#7f8c8d;">Наименьшее выражение</div>
+                    </div>
+                    <div class="stat-card" style="background:white;border:1px solid #e8ecf0;border-radius:12px;padding:18px;text-align:center;">
+                        <div class="stat-value" style="font-size:26px;font-weight:800;color:#2c3e50;">${maxP}%</div>
+                        <div class="stat-label" style="font-size:14px;color:#7f8c8d;">Наибольшее выражение</div>
+                    </div>
+                </div>
+            `;
+
+            // Радар
+            html += `
+                <div class="radar-container">
+                    <canvas id="radarCanvas" width="500" height="500"></canvas>
+                </div>
+            `;
+
+            // Шкалы
+            html += `<div class="results-grid">`;
 
             for (const [key, scale] of Object.entries(SCALES)) {
-                const score = scores[key];
-                const desc = getScaleDescription(key, score);
-                const color = scale.color;
+                const raw = scores[key];
+                const percentile = percentiles[key];
+                const level = getLevel(percentile);
+                const int = getInterpretation(key, percentile);
 
                 html += `
                     <div class="scale-card">
-                        <div class="scale-header" style="background: ${color}">
-                            ${scale.icon} ${scaleNames[key]}
+                        <div class="scale-header" style="background: ${scale.color}">
+                            ${scale.icon} ${scale.name}
+                            <span style="font-weight:400;font-size:14px;">${level.emoji} ${level.label}</span>
                         </div>
                         <div class="scale-body">
                             <div class="scale-row">
-                                <span class="scale-score">Баллы: ${score}/50</span>
-                                <span class="scale-level" style="color: ${color}">${desc.level}</span>
+                                <span class="scale-score">${raw} из 50</span>
+                                <span class="scale-percentile">${percentile}%</span>
                             </div>
                             <div class="scale-bar">
-                                <div class="fill" style="width: ${score * 2}%; background: ${color}"></div>
+                                <div class="fill" style="width: ${percentile}%; background: ${scale.color}"></div>
                             </div>
-                            <div class="scale-title" style="color: ${color}">${desc.title}</div>
-                            <div class="scale-desc">${desc.desc}</div>
+                            <div class="scale-title">${int.title}</div>
+                            <div class="scale-desc">${int.desc}</div>
+                            <div class="scale-reflection">
+                                <strong>💭 Для размышления:</strong><br>
+                                ${getReflectionQuestion(key, percentile)}
+                            </div>
                         </div>
                     </div>
                 `;
             }
 
-            if (recommendations.length > 0) {
-                html += `
-                    <div class="recommendations">
-                        <h3>📋 РЕКОМЕНДАЦИИ ПО САМОРАЗВИТИЮ</h3>
-                        <ul>
-                            ${recommendations.map(r => `<li>${r}</li>`).join('')}
-                        </ul>
-                    </div>
-                `;
-            }
+            html += `</div>`;
 
+            // Вопросы для рефлексии
+            html += `
+                <div class="reflection-questions">
+                    <h3>💭 Вопросы для самоисследования</h3>
+                    <ul>
+                        <li>Какие результаты вас удивили больше всего?</li>
+                        <li>Как вы думаете, почему некоторые черты выражены сильнее других?</li>
+                        <li>Менялись ли эти качества в течение вашей жизни?</li>
+                        <li>Что вы могли бы сделать, чтобы лучше использовать свои сильные стороны?</li>
+                        <li>В каких ситуациях ваши менее выраженные качества могут быть полезны?</li>
+                    </ul>
+                </div>
+            `;
+
+            // Кнопки
             html += `
                 <div class="results-actions">
-                    <button class="btn btn-save" onclick="saveCurrentResult()">💾 Сохранить результаты</button>
-                    <button class="btn btn-reset" onclick="resetTest()">🔄 Пройти заново</button>
+                    <button class="btn-pdf" onclick="exportPDF()">📄 Скачать PDF-отчёт</button>
+                    <button class="btn-reset" onclick="resetTest()">🔄 Пройти заново</button>
                 </div>
             `;
 
             document.getElementById('resultsContent').innerHTML = html;
             showScreen('resultsScreen');
+
+            setTimeout(() => {
+                const canvas = document.getElementById('radarCanvas');
+                if (canvas) drawRadar(canvas, scores, maxScore);
+            }, 100);
         }
 
-        function saveCurrentResult() {
-            alert(`✅ Результаты теста для ${state.userName} успешно сохранены!\nВсего сохранённых результатов: ${state.resultsHistory.length}`);
+        // ================================================================
+        // ВОПРОСЫ ДЛЯ РАЗМЫШЛЕНИЯ
+        // ================================================================
+
+        function getReflectionQuestion(scale, percentile) {
+            const questions = {
+                Nurturing: {
+                    high: 'Как вы заботитесь о себе, когда много заботитесь о других?',
+                    medium: 'В каких ситуациях вам легче проявлять заботу, а в каких — сложнее?',
+                    low: 'Что помогает вам понимать чувства других людей, когда вы этого хотите?'
+                },
+                Assertiveness: {
+                    high: 'Как вы находите баланс между своей инициативой и желаниями других?',
+                    medium: 'В каких ситуациях вы чувствуете себя увереннее, а в каких — нет?',
+                    low: 'Что вам помогает проявлять инициативу, когда это действительно важно?'
+                },
+                Tenacity: {
+                    high: 'Какие практики помогают вам сохранять спокойствие в стрессе?',
+                    medium: 'Какие ситуации выводят вас из равновесия и как вы справляетесь с этим?',
+                    low: 'Что помогает вам восстановиться после стрессовых ситуаций?'
+                },
+                Unconventionality: {
+                    high: 'Как вы проверяете, что ваши нестандартные идеи действительно работают?',
+                    medium: 'В каких областях вам легче проявлять креативность?',
+                    low: 'Что помогает вам выходить за рамки привычного мышления, когда это необходимо?'
+                },
+                Resilience: {
+                    high: 'Какие практики помогают вам быстро восстанавливаться после неудач?',
+                    medium: 'Что помогает вам справляться с трудностями, когда становится тяжело?',
+                    low: 'Какие стратегии поддержки вы используете в сложных ситуациях?'
+                },
+                Extraversion: {
+                    high: 'Как вы поддерживаете баланс между общением и временем для себя?',
+                    medium: 'В каких ситуациях вы чувствуете потребность в общении, а в каких — в уединении?',
+                    low: 'Что помогает вам выстраивать социальные контакты, когда вы этого хотите?'
+                }
+            };
+
+            const q = questions[scale];
+            if (percentile >= 60) return q.high;
+            if (percentile >= 40) return q.medium;
+            return q.low;
         }
 
-        function resetTest() {
-            if (confirm('Вы уверены, что хотите пройти тест заново?')) {
-                state.currentQuestion = 0;
-                state.answers = new Array(QUESTIONS.length).fill(0);
-                showScreen('nameScreen');
-                document.getElementById('nameInput').value = '';
-                document.getElementById('nameInput').focus();
-                loadHistory();
+        // ================================================================
+        // ЭКСПОРТ PDF (С ИСПОЛЬЗОВАНИЕМ html2canvas)
+        // ================================================================
+
+        function showLoader(text) {
+            const overlay = document.getElementById('loaderOverlay');
+            document.getElementById('loaderText').textContent = text || 'Подготовка отчёта...';
+            overlay.classList.add('active');
+        }
+
+        function hideLoader() {
+            document.getElementById('loaderOverlay').classList.remove('active');
+        }
+
+        async function exportPDF() {
+            const btn = document.querySelector('.btn-pdf');
+            if (!btn) return;
+
+            try {
+                showLoader('Подготовка отчёта...');
+
+                if (typeof window.jspdf === 'undefined' || typeof window.html2canvas === 'undefined') {
+                    throw new Error('Не удалось загрузить библиотеки. Проверьте интернет-соединение.');
+                }
+
+                const { jsPDF } = window.jspdf;
+
+                // ===== 1. СОЗДАЁМ PDF-КОНТЕНТ =====
+                const scores = calculateScores();
+                const maxScore = 50;
+                const percentiles = {};
+                for (const [key, value] of Object.entries(scores)) {
+                    percentiles[key] = calculatePercentile(value, maxScore);
+                }
+                const profile = getGeneralProfile(scores, maxScore);
+
+                const now = new Date();
+                const dateStr = now.toLocaleDateString('ru-RU') + ' ' + now.toLocaleTimeString('ru-RU', { hour: '2-digit',
+                    minute: '2-digit' });
+
+                let pdfHtml = `
+                    <div style="font-family:'Segoe UI',Tahoma,Geneva,Verdana,sans-serif;padding:20px;">
+                        <div style="text-align:center;border-bottom:3px solid #f39c12;padding-bottom:20px;margin-bottom:20px;">
+                            <h1 style="font-size:28px;color:#2c3e50;">The <span style="color:#f39c12;">NATURE</span> Code</h1>
+                            <p style="font-size:14px;color:#7f8c8d;">Инструмент для саморефлексии</p>
+                            <p style="font-size:11px;color:#95a5a6;font-style:italic;margin-top:6px;">
+                                ⚖️ Этот инструмент не является психологической диагностикой. 
+                                Результаты не являются диагнозом и не должны использоваться для принятия важных жизненных решений.
+                            </p>
+                        </div>
+
+                        <div style="margin-bottom:16px;">
+                            <p style="font-size:15px;color:#2c3e50;"><strong>Имя:</strong> ${state.userName}</p>
+                            <p style="font-size:15px;color:#2c3e50;"><strong>Дата:</strong> ${dateStr}</p>
+                            <p style="font-size:16px;color:#f39c12;font-weight:700;">${profile}</p>
+                        </div>
+                `;
+
+                for (const [key, scale] of Object.entries(SCALES)) {
+                    const raw = scores[key];
+                    const percentile = percentiles[key];
+                    const level = getLevel(percentile);
+                    const int = getInterpretation(key, percentile);
+                    const refQ = getReflectionQuestion(key, percentile);
+
+                    pdfHtml += `
+                        <div style="margin-bottom:14px;padding-bottom:12px;border-bottom:1px solid #ecf0f1;">
+                            <div style="display:flex;justify-content:space-between;align-items:center;">
+                                <span style="font-size:15px;font-weight:700;color:#2c3e50;">${scale.icon} ${scale.name}</span>
+                                <span style="font-size:14px;color:#7f8c8d;">${raw} из 50 (${percentile}%, ${level.label})</span>
+                            </div>
+                            <div style="width:100%;height:8px;background:#ecf0f1;border-radius:4px;margin:4px 0;overflow:hidden;">
+                                <div style="width:${percentile}%;height:100%;background:${scale.color};border-radius:4px;"></div>
+                            </div>
+                            <div style="font-size:14px;font-weight:600;color:#2c3e50;margin-top:4px;">${int.title}</div>
+                            <div style="font-size:13px;color:#555;line-height:1.6;">${int.desc}</div>
+                            <div style="font-size:13px;color:#6b5200;background:#fef9e7;padding:6px 10px;border-radius:4px;margin-top:4px;">
+                                <strong>💭 Для размышления:</strong> ${refQ}
+                            </div>
+                        </div>
+                    `;
+                }
+
+                pdfHtml += `
+                        <div style="margin-top:16px;padding-top:16px;border-top:2px solid #f39c12;">
+                            <h3 style="font-size:16px;color:#2c3e50;margin-bottom:8px;">💭 Вопросы для самоисследования</h3>
+                            <ul style="list-style:none;padding:0;">
+                                <li style="font-size:13px;color:#555;padding:3px 0;">• Какие результаты вас удивили больше всего?</li>
+                                <li style="font-size:13px;color:#555;padding:3px 0;">• Как вы думаете, почему некоторые черты выражены сильнее других?</li>
+                                <li style="font-size:13px;color:#555;padding:3px 0;">• Менялись ли эти качества в течение вашей жизни?</li>
+                                <li style="font-size:13px;color:#555;padding:3px 0;">• Что вы могли бы сделать, чтобы лучше использовать свои сильные стороны?</li>
+                                <li style="font-size:13px;color:#555;padding:3px 0;">• В каких ситуациях ваши менее выраженные качества могут быть полезны?</li>
+                            </ul>
+                        </div>
+
+                        <div style="text-align:center;font-size:10px;color:#bdc3c7;margin-top:24px;padding-top:12px;border-top:1px solid #ecf0f1;">
+                            © The NATURE Code — инструмент для саморефлексии | Версия 3.0
+                        </div>
+                    </div>
+                `;
+
+                const container = document.getElementById('pdfContainer');
+                container.innerHTML = pdfHtml;
+
+                showLoader('Создание изображения...');
+
+                // ===== 2. СОЗДАЁМ СКРИНШОТ =====
+                const canvas = await html2canvas(container, {
+                    scale: 2,
+                    useCORS: true,
+                    logging: false,
+                    backgroundColor: '#ffffff',
+                    width: 800,
+                    height: container.scrollHeight
+                });
+
+                const imgData = canvas.toDataURL('image/jpeg', 0.95);
+
+                // ===== 3. СОЗДАЁМ PDF =====
+                showLoader('Сохранение PDF...');
+
+                const pdf = new jsPDF('p', 'mm', 'a4');
+                const pdfWidth = 210;
+                const pdfHeight = 297;
+                const imgWidth = pdfWidth - 20;
+                const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
+                let heightLeft = imgHeight;
+                let position = 10;
+
+                // Первая страница
+                pdf.addImage(imgData, 'JPEG', 10, position, imgWidth, imgHeight);
+                heightLeft -= (pdfHeight - 20);
+
+                // Дополнительные страницы, если контент не помещается
+                while (heightLeft > 0) {
+                    position = - (imgHeight - (pdfHeight - 20) * (Math.ceil(imgHeight / (pdfHeight - 20)) - 1));
+                    pdf.addPage();
+                    pdf.addImage(imgData, 'JPEG', 10, position, imgWidth, imgHeight);
+                    heightLeft -= (pdfHeight - 20);
+                }
+
+                pdf.save('The_NATURE_Code_' + state.userName + '.pdf');
+                hideLoader();
+
+            } catch (error) {
+                console.error('Ошибка PDF:', error);
+                hideLoader();
+                alert('Не удалось создать PDF: ' + error.message +
+                    '\n\nПопробуйте использовать функцию печати браузера (Ctrl+P) и выберите "Сохранить как PDF".');
             }
         }
 
-        // ============================================================
+        // ================================================================
         // ИСТОРИЯ
-        // ============================================================
+        // ================================================================
 
         function showHistory() {
             const modal = document.getElementById('historyModal');
             const list = document.getElementById('historyList');
 
             if (state.resultsHistory.length === 0) {
-                list.innerHTML = `<div class="no-history">📭 История результатов пока пуста</div>`;
+                list.innerHTML = '<div class="no-history">📭 История результатов пока пуста</div>';
             } else {
                 let html = `
                     <table class="history-table">
-                        <thead><tr><th>#</th><th>Имя</th><th>Дата</th><th>Профиль</th></tr></thead>
+                        <thead>
+                            <tr>
+                                <th>#</th>
+                                <th>Имя</th>
+                                <th>Дата</th>
+                                <th>Профиль</th>
+                            </tr>
+                        </thead>
                         <tbody>
                 `;
                 [...state.resultsHistory].reverse().forEach((result, index) => {
@@ -1476,22 +2148,32 @@
             if (e.target === this) closeHistory();
         });
 
-        document.addEventListener('keydown', function(e) {
-            if (e.key === 'Escape') closeHistory();
-        });
+        // ================================================================
+        // СБРОС
+        // ================================================================
 
-        // ============================================================
-        // ЗАПУСК
-        // ============================================================
+        function resetTest() {
+            if (!confirm('Пройти заново? Текущий результат сохранится в истории.')) return;
+            state.currentQuestion = 0;
+            state.answers = new Array(QUESTIONS.length).fill(0);
+            showScreen('nameScreen');
+            document.getElementById('nameInput').value = '';
+            document.getElementById('nameInput').focus();
+            loadHistory();
+        }
+
+        // ================================================================
+        // ИНИЦИАЛИЗАЦИЯ
+        // ================================================================
 
         loadHistory();
         showScreen('nameScreen');
         document.getElementById('nameInput').focus();
 
-        console.log('🌿 The NATURE Code by Igor Demin loaded!');
-        console.log(`📝 ${QUESTIONS.length} questions, ${Object.keys(SCALES).length} scales`);
-        console.log(`📊 ${state.resultsHistory.length} saved results`);
+        console.log('🌿 The NATURE Code — Инструмент для саморефлексии v3.0');
+        console.log('📝 ' + QUESTIONS.length + ' вопросов, ' + Object.keys(SCALES).length + ' измерений');
+        console.log('⚖️ Этичный инструмент. Не является диагностикой.');
+        console.log('📄 PDF-экспорт работает через html2canvas');
     </script>
-
 </body>
 </html>
